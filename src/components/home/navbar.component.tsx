@@ -1,142 +1,196 @@
-import React, { useState } from "react";
-import {
-  Box,
-  Flex,
-  HStack,
-  IconButton,
-  Button,
-  Avatar,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  MenuDivider,
-  Stack,
-  useColorModeValue,
-} from '@chakra-ui/react';
-import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
+import { useState } from "react";
 
-import  NavButton from "../Buttons/navbarButton"
-
-
-interface User {
-  name: string;
-  avatar: string;
-}
 
 const NavBarComponent: React.FC = () => {
-  const Links = ['Home', 'About', 'Contact'];
+  const Links = ["Home", "About", "Contact"];
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null); // Simulates whether the user is logged in
+  const [user, setUser] = useState<null | { name: string; avatar: string }>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
+  // Simulate Login
   const handleLogin = () => {
-    // Simulate login logic
     setUser({
-      name: 'John Doe',
-      avatar: 'https://images.unsplash.com/photo-1493666438817-866a91353ca9?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9',
+      name: "John Doe",
+      avatar:
+        "https://images.unsplash.com/photo-1493666438817-866a91353ca9?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9",
     });
   };
 
+  // Simulate Logout
   const handleLogout = () => {
-    // Simulate logout logic
     setUser(null);
+    setDropdownOpen(false);
   };
+
   const toggleMenu = () => setIsOpen(!isOpen);
 
-
-  function handleClick(): void {
-    handleLogin();
-  }
   return (
-    <>
-    <Box bg={useColorModeValue('custom.500', 'custom.600')} px={4} className=" -mb-20 z-auto">
-      <Flex
-        h={16}
-        alignItems="center"
-        justifyContent="space-between"
-        position="relative"
-      >
-        {/* Logo */}
-        <Box color="white" fontWeight="bold" fontSize="lg" className=" md:ml-36" >
-          Logo
-        </Box>
+    <nav className="bg-[#970747] shadow-md top-0 sticky w-full z-50">
+      <div className="container mx-auto px-4 flex justify-between items-center h-16">
+        {/* Brand */}
+        <div className="text-2xl font-bold text-white">BrandName</div>
 
-        {/* Centered Links */}
-        <HStack
-          as="nav"
-          spacing={4}
-          color="white"
-          position="absolute"
-          left="50%"
-          transform="translateX(-50%)"
-          display={{ base: 'none', md: 'flex' }}
-        >
+        {/* Navigation Links */}
+        <div className="hidden md:flex space-x-8">
           {Links.map((link) => (
-            <a key={link} 
-            color="white" href={`/${link.toLowerCase()}`} className="link" style={{
-              outline: 'none',
-            }}>
+            <a
+              key={link}
+              href={`/${link.toLowerCase()}`}
+              className="text-white hover:text-gray-300"
+            >
               {link}
             </a>
           ))}
-        </HStack>
+        </div>
 
-        {/* Right Section */}
-        <Flex alignItems="center" gap={4}>
+        {/* Hamburger Menu, Avatar, and Logout */}
+        <div className="flex items-center space-x-4 md:hidden">
+
+
           {user ? (
-            <Menu>
-              <MenuButton
-                as={Button}
-                rounded="full"
-                variant="link"
-                cursor="pointer"
-                minW={0}
-              >
-                <Avatar size="sm" src={user.avatar} />
-              </MenuButton>
-              <MenuList>
-                <MenuItem>Profile</MenuItem>
-                <MenuItem>Settings</MenuItem>
-                <MenuDivider />
-                <MenuItem onClick={handleLogout}>Logout</MenuItem>
-              </MenuList>
-            </Menu>
-          ) : (
-            <HStack spacing={4}>
-
-              <NavButton text="SignIn" onClick={handleClick} />
-              <NavButton text="SignUp"  />
-            </HStack>
-          )}
-
-          {/* Hamburger Icon */}
-          <IconButton
-            size="md"
-            icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
-            aria-label="Toggle Menu"
-            display={{ md: 'none' }}
+            <>
+              <img
+                src={user.avatar}
+                alt="User Profile"
+                className="w-10 h-10 rounded-full border-2 border-white object-cover cursor-pointer"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+              />
+              {dropdownOpen && (
+                <div className="absolute right-4 top-16 w-48 bg-white rounded-md shadow-lg z-50">
+                  <a
+                    href="/profile"
+                    className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+                  >
+                    Profile
+                  </a>
+                  <a
+                    href="/settings"
+                    className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+                  >
+                    Settings
+                  </a>
+                  <div className="border-t my-2"></div>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </>
+          ) : null}
+                    <button
+            className="text-white hover:text-gray-300"
             onClick={toggleMenu}
-          />
-        </Flex>
-      </Flex>
+          >
+            <svg
+              className="w-6 h-6"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d={
+                  isOpen
+                    ? "M6 18L18 6M6 6l12 12"
+                    : "M4 6h16M4 12h16M4 18h16"
+                }
+              />
+            </svg>
+          </button>
+        </div>
+
+        {/* Right Section for Desktop */}
+        <div className="hidden md:flex space-x-4 items-center relative">
+          {user ? (
+            <div className="relative">
+              <img
+                src={user.avatar}
+                alt="User Profile"
+                className="w-10 h-10 rounded-full border-2 border-white object-cover cursor-pointer"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+              />
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg">
+                  <a
+                    href="/profile"
+                    className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+                  >
+                    Profile
+                  </a>
+                  <a
+                    href="/settings"
+                    className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+                  >
+                    Settings
+                  </a>
+                  <div className="border-t my-2"></div>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              <button
+                className="text-white border border-white px-4 py-2 rounded hover:bg-white hover:text-[#970747]"
+                onClick={handleLogin}
+              >
+                Sign In
+              </button>
+              <button className="bg-white text-[#970747] px-4 py-2 rounded hover:bg-gray-200">
+                Sign Up
+              </button>
+            </>
+          )}
+        </div>
+      </div>
 
       {/* Mobile Menu */}
       {isOpen && (
-        <Box pb={4} display={{ md: 'none' }}>
-          <Stack as="nav" spacing={4}>
-            {Links.map((link) => (
-               <a key={link} 
-               color="white" href={`#${link.toLowerCase()}`} className="link" style={{
-                 outline: 'none',
-               }}>
-                 {link}
-               </a>
-            ))}
-          </Stack>
-        </Box>
+        <div className="md:hidden bg-white shadow-lg p-4">
+          {Links.map((link) => (
+            <a
+              key={link}
+              href={`/${link.toLowerCase()}`}
+              className="block text-gray-800 px-4 py-2 hover:text-[#970747]"
+            >
+              {link}
+            </a>
+          ))}
+          <div className="border-t mt-2 pt-2 space-y-2">
+            {user ? (
+              <a
+              
+              href='#'
+              className="block text-gray-800 px-4 py-2 hover:text-[#970747]"
+            >Setting</a>
+            ) : (
+              <>
+                <button
+                  className="w-full text-[#970747] border border-[#970747] px-4 py-2 rounded hover:bg-[#970747] hover:text-white"
+                  onClick={handleLogin}
+                >
+                  Sign In
+                </button>
+                <button className="w-full bg-[#970747] text-white px-4 py-2 rounded hover:bg-[#970747]/90">
+                  Sign Up
+                </button>
+              </>
+            )}
+          </div>
+        </div>
       )}
-    </Box>
-  </>
+    </nav>
   );
 };
 
