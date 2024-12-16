@@ -19,9 +19,6 @@ import { useForm } from "react-hook-form";
 
 
 function RegisterForm() {
-
-
-
   const {
     register,
     handleSubmit,

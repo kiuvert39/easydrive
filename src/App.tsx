@@ -1,25 +1,26 @@
+import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router";
-import './App.css'
-import LoginPage from "./pages/auth/login.page";
-import SignUpPage from "./pages/auth/signup.page";
 import NavBarComponent from "./components/home/navbar.component";
+import "./App.css";
+
+const LoginPage = React.lazy(() => import("./pages/auth/login.page"));
+const SignUpPage = React.lazy(() => import("./pages/auth/signup.page"));
+const Profile = React.lazy(() => import("./pages/Booking/rentals.page"));
 
 function App() {
-
-
   return (
     <>
       <BrowserRouter>
-      <NavBarComponent/>
+        <NavBarComponent />
+
         <Routes>
-          <Route path="signin" element={<LoginPage/>} />
+          <Route path="signin" element={<LoginPage />} />
           <Route path="signup" element={<SignUpPage />} />
-       
+          <Route path="bookings" element={<Profile />} />
         </Routes>
       </BrowserRouter>
-
     </>
-  )
+  );
 }
 
-export default App
+export default App;
