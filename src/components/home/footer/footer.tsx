@@ -1,3 +1,4 @@
+
 import { Flex, Link as A, Box, useColorModeValue, Image } from "@chakra-ui/react";
 
 /**
@@ -21,15 +22,15 @@ function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <Box bg={useColorModeValue("custom.500", "custom.600")} px={2} py={1}>
-      <Box maxW="260px" mx="auto" p={2}>
+    <Box bg={useColorModeValue("custom.500", "custom.600")} px={2} py={0.5}>
+      <Box maxW="260px" mx="auto" p={1}>
         <Flex direction={{ base: "column", md: "row" }} align="center" justify="center">
 
           {/* Logo */}
           <Image
-            src="/images/logo3.png"
+            src="/images/newlogo.png"
             alt="EasyDrive Logo"
-            boxSize="120px"
+            boxSize="90px" // Reduced size
             objectFit="contain"
           />
         </Flex>
@@ -38,7 +39,7 @@ function Footer() {
         <Box textAlign="center" fontSize="sm" color="black">
           © {currentYear} EasyDrive. All Rights Reserved.
           <br />
-          <A href="https://github.com/yourgithub/EasyDrive" isExternal color="#0d5f07">
+          <A href="https://github.com/yourgithub/EasyDrive" isExternal color="white">
             Made with ❤️ by the EasyDrive Team.
           </A>
         </Box>

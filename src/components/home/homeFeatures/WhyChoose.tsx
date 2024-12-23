@@ -1,4 +1,5 @@
 import { Box, Flex, Heading, Text, Icon, VStack } from "@chakra-ui/react";
+import { motion } from "framer-motion";
 import { FaCar, FaLeaf, FaCog } from "react-icons/fa";
 import carImage from "../../../assets/images/cars/car01.jpg";
 
@@ -33,10 +34,10 @@ const WhyChooseUs = () => {
   ];
 
   return (
-    <Box bg="#EDEFF1" py={10} px={6}>
+    <Box id="chooseUs" bg="#FFEDE6" py={10} px={6}>
       {/* Title Section */}
       <Box textAlign="center" mb={8}>
-        <Heading fontSize="4xl" fontWeight="bold" mb={4}>
+        <Heading fontSize="4xl" fontWeight="bold" mb={4} marginTop={-5}>
           Why Choose EasyDrive 🚗✨
         </Heading>
         {/* New Emoji-based Bullet Points */}
@@ -52,7 +53,7 @@ const WhyChooseUs = () => {
 
       <Flex direction={{ base: "column", lg: "row" }} align="center" gap={6}>
         {/* Left Section: Image */}
-        <Box flex="1">
+        <Box flex="1" textAlign="center">
           <img
             src={carImage}
             alt="Car"
@@ -60,29 +61,36 @@ const WhyChooseUs = () => {
           />
         </Box>
 
-        {/* Right Section: Content */}
+        <motion.div style={{ flex: 1 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
+
         <Box flex="1">
           <VStack align="start" spacing={6}>
             {features.map((feature, index) => (
-              <Flex
+                <Flex
                 key={index}
                 align="start"
                 bg="white"
-                p={4}
-                shadow="md"
+                p={6}
+                shadow="lg"
                 borderRadius="lg"
-              >
-                <Icon as={feature.icon} w={8} h={8} color="#0d5f07" mr={4} />
+                w="100%"
+                transition="transform 0.3s"
+                _hover={{ transform: "scale(1.05)" }}
+                >
+                <Icon as={feature.icon} w={10} h={10} color="#970747" mr={4} />
                 <Box>
-                  <Text fontWeight="bold" fontSize="lg">
-                    {feature.title}
+                  <Text fontWeight="bold" fontSize="xl" mb={2}>
+                  {feature.title}
                   </Text>
-                  <Text fontSize="sm">{feature.description}</Text>
+                  <Text fontSize="md" color="gray.600">
+                  {feature.description}
+                  </Text>
                 </Box>
-              </Flex>
+                </Flex>
             ))}
           </VStack>
         </Box>
+        </motion.div>
       </Flex>
     </Box>
   );
