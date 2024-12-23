@@ -2,7 +2,7 @@ import { useState } from "react";
 
 
 const NavBarComponent: React.FC = () => {
-  const Links = ["Home", "About", "Contact"];
+  const Links = ["Home", "How To Rent", "Choose Us", "About", "Contact"];
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<null | { name: string; avatar: string }>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -28,8 +28,11 @@ const NavBarComponent: React.FC = () => {
     <nav className="bg-[#970747] shadow-md top-0 sticky w-full z-50">
       <div className="container mx-auto px-4 flex justify-between items-center h-16">
         {/* Brand */}
-        <div className="text-2xl font-bold text-white">BrandName</div>
-
+        <img
+            src="/images/newlogo.png"
+            alt="EasyDrive Logo"
+            style={{ width: "120px", objectFit: "contain" }}
+          />
         {/* Navigation Links */}
         <div className="hidden md:flex space-x-8">
           {Links.map((link) => (

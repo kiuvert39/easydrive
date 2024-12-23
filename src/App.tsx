@@ -4,6 +4,7 @@ import "./App.css";
 import Layout from "../src/components/layout";
 import CarRentalProcess from "./pages/Booking/car";
 import ProfilePage from "./pages/ProfilePage";
+import HomePage from "./pages/homePage";
 
 // Lazy-loaded components
 const LoginPage = React.lazy(() => import("./pages/auth/login.page"));
@@ -26,6 +27,7 @@ const App: React.FC = () => {
       <Suspense fallback={<div>Loading...</div>}>
         <Layout>
           <Routes>
+            <Route path="/" element={<HomePage />} />
             <Route path="signin" element={<LoginPage />} />
             <Route path="signup" element={<SignUpPage />} />
             <Route path="bookings" element={<Profile />} />
