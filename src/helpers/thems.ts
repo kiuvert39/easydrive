@@ -10,8 +10,8 @@ const theme = extendTheme({
   config,
   colors: {
     custom: {
-      500: "#B9C2C8", // Custom primary color
-      600: "#394853", // Optional darker shade for hover
+      500: "#970747", // Custom primary color
+      600: "#7a063a", // Optional darker shade for hover
     },
   },
 });

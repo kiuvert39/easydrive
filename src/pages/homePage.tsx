@@ -1,4 +1,3 @@
-import Footer from "../components/home/footer/footer";
 import HeroSection from "../components/home/homeFeatures/HeroSection"
 import HowToRent from "../components/home/homeFeatures/HowToRent"
 import WhyChoose from "../components/home/homeFeatures/WhyChoose"
@@ -14,10 +13,7 @@ function HomePage() {
         <About/>
         <ContactUs/>
 
-
-    
             
-            <Footer />
         </>
     );
 }

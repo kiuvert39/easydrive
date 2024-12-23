@@ -27,7 +27,7 @@ const AboutSection: React.FC = () => {
 
             {/* Team Introduction Section */}
             <Box>
-                <Heading fontSize="4xl" fontWeight="semibold" mb={1} textAlign="center" color="black">
+                <Heading fontSize="4xl" fontWeight="semibold" mb={5} textAlign="center" color="black">
                     Meet the Team 👥
                 </Heading>
                 <Flex
