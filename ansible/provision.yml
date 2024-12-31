@@ -3,6 +3,13 @@
   hosts: linode
   become: true  # Run tasks with sudo privileges
   tasks:
+    # Install community.docker collection
+    - name: Install community.docker collection
+      ansible.builtin.pip:
+        name: ansible-collections-community-docker
+        executable: pip3
+      when: ansible_version.full is version('2.10', '>=')
+
     # Update and upgrade all packages
     - name: Update and upgrade all packages
       apt:
@@ -40,19 +47,19 @@
 
     # Docker login to Docker Hub
     - name: Log into Docker Hub
-      docker_login:
+      community.docker.docker_login:
         username: "{{ lookup('env', 'DOCKER_USERNAME') }}"
         password: "{{ lookup('env', 'DOCKER_PASSWORD') }}"
 
     # Pull the Docker image from Docker Hub
     - name: Pull Docker image from Docker Hub
-      docker_image:
+      community.docker.docker_image:
         name: "{{ image_tag }}"  # The image_tag is passed from GitHub Actions as an extra var
         source: pull
 
     # Run the Docker container
     - name: Run Docker container
-      docker_container:
+      community.docker.docker_container:
         name: easydrive
         image: "{{ image_tag }}"
         state: started
