@@ -97,6 +97,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install ansible
           ansible-galaxy collection install community.docker
+      
+      - name: Check Ansible Version
+        run: ansible --version
 
       - name: Run Ansible Playbook
         uses: ansible/ansible-lint-action@v6
