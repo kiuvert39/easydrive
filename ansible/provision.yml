@@ -1,12 +1,15 @@
-- name: Provision Linode Server
+---
+- name: Provision Linode Server and Deploy Docker Container
   hosts: linode
   become: true  # Run tasks with sudo privileges
   tasks:
+    # Update and upgrade all packages
     - name: Update and upgrade all packages
       apt:
         update_cache: yes
         upgrade: dist
 
+    # Ensure essential packages are installed
     - name: Ensure essential packages are installed
       apt:
         name:
@@ -34,6 +37,28 @@
             name: docker
             state: started
             enabled: yes
+
+    # Docker login to Docker Hub
+    - name: Log into Docker Hub
+      docker_login:
+        username: "{{ lookup('env', 'DOCKER_USERNAME') }}"
+        password: "{{ lookup('env', 'DOCKER_PASSWORD') }}"
+
+    # Pull the Docker image from Docker Hub
+    - name: Pull Docker image from Docker Hub
+      docker_image:
+        name: "{{ image_tag }}"  # The image_tag is passed from GitHub Actions as an extra var
+        source: pull
+
+    # Run the Docker container
+    - name: Run Docker container
+      docker_container:
+        name: easydrive
+        image: "{{ image_tag }}"
+        state: started
+        restart_policy: always
+        published_ports:
+          - "80:80"  # Map container port 80 to host port 80 (change as necessary)
 
   handlers:
     # No need to reload Nginx as we are not configuring Nginx in this playbook

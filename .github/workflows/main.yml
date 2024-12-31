@@ -9,6 +9,10 @@ on:
     branches:
       - release-*
       - main
+  
+
+  workflow_dispatch:  # Manual trigger for the build job
+
 
 jobs:
   lint:
@@ -101,7 +105,15 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Deploy Application
+      - name: Set up SSH key
         run: |
-          echo "Deploying application..."
-          # Add custom deployment steps here, e.g., running containers or restarting services
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Deploy Application with Ansible
+        run: |
+          echo "Deploying Docker image..."
+          # Set environment variables for Docker image and tag
+          export IMAGE_TAG="egbe01/easydrive:${{ github.sha }}"
+          ansible-playbook ansible/deploy.yml -i ansible/inventory.ini --extra-vars "image_tag=$IMAGE_TAG"
