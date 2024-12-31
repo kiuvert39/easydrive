@@ -3,11 +3,16 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main  # Only trigger on pushes to main
+      - main
 
   pull_request:
     branches:
-      - release-*  # Trigger workflows for PRs targeting release branches
+      - release-*
+      - main
+  
+
+  workflow_dispatch:  # Manual trigger for the build job
+
 
 jobs:
   lint:
@@ -29,37 +34,14 @@ jobs:
       - name: Run Linter
         run: npm run lint
 
-  test:
+  security_scan:
     if: github.ref == 'refs/heads/main'
-    name: Run Tests
+    name: Security Scan
     runs-on: ubuntu-latest
     needs: lint
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
-      - name: Set Up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Run Tests
-        run: npm test
-
-  security_scan:
-    if: github.ref == 'refs/heads/main'
-    name: Security Scan
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Set Up Dependabot
-        uses: dependabot/fetch-metadata@v1
 
       - name: Run Security Scan
         run: npm audit --audit-level=high
@@ -75,23 +57,25 @@ jobs:
       
       - name: Set Up Docker Buildx
         uses: docker/setup-buildx-action@v2
-   
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       
+      - name: Verify Docker Login
+        run: docker info  # Debugging step to verify Docker login
+
       - name: Build Docker Image
         run: |
-          docker build -t my-image-name:${{ github.sha }} .
-              
-          - name: Push Docker Image to Docker Hub
-            run: |
-            docker push my-image-name:${{ github.sha }}
+          docker build -t egbe01/easydrive:${{ github.sha }} .
+
+      - name: Push Docker Image to Docker Hub
+        run: |
+          docker push egbe01/easydrive:${{ github.sha }}
 
   post_deployment:
-
     if: contains(github.ref, 'refs/pull/') && contains(github.event.pull_request.base.ref, 'release-')
     name: Provision Linode Server
     runs-on: ubuntu-latest
@@ -99,18 +83,18 @@ jobs:
     steps:
       - name: Checkout Playbook
         uses: actions/checkout@v4
-  
+
       - name: Set Environment Variables
         run: |
-            echo "LINODE_HOST=${{ secrets.LINODE_HOST }}" >> $GITHUB_ENV
-            echo "SSH_PRIVATE_KEY=${{ secrets.SSH_PRIVATE_KEY }}" >> $GITHUB_ENV
-  
+          echo "LINODE_HOST=${{ secrets.LINODE_HOST }}" >> $GITHUB_ENV
+          echo "SSH_PRIVATE_KEY=${{ secrets.SSH_PRIVATE_KEY }}" >> $GITHUB_ENV
+
       - name: Run Ansible Playbook
         uses: ansible/ansible-lint-action@v6
         with:
           args: ansible-playbook ansible/provision.yml -i ansible/inventory.ini
         env:
-            ANSIBLE_HOST_KEY_CHECKING: 'False'
+          ANSIBLE_HOST_KEY_CHECKING: 'False'
 
   deploy:
     if: contains(github.event.pull_request.base.ref, 'release-') && startsWith(github.head_ref, 'v')
@@ -121,7 +105,15 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Deploy Application
+      - name: Set up SSH key
         run: |
-          echo "Deploying application..."
-          # Add custom deployment steps here, e.g., running containers or restarting services
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Deploy Application with Ansible
+        run: |
+          echo "Deploying Docker image..."
+          # Set environment variables for Docker image and tag
+          export IMAGE_TAG="egbe01/easydrive:${{ github.sha }}"
+          ansible-playbook ansible/deploy.yml -i ansible/inventory.ini --extra-vars "image_tag=$IMAGE_TAG"
