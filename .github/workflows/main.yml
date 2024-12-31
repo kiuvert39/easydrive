@@ -62,8 +62,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       
       - name: Verify Docker Login
-        run: docker info  # Debugging step to verify Docker login
-
+        run: docker info  
       - name: Build Docker Image
         run: |
           docker build -t egbe01/easydrive:${{ github.sha }} .
@@ -79,17 +78,18 @@ jobs:
     steps:
       - name: Checkout Playbook
         uses: actions/checkout@v4
-      
+
       - name: Debug Secret Values
         run: |
           echo "LINODE_HOST=\"${{ secrets.LINODE_HOST }}\""
-          echo "SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}"
-      
+          echo "SSH_PRIVATE_KEY: <hidden>"
 
       - name: Set Environment Variables
         run: |
-          echo "LINODE_HOST=\"${{ secrets.LINODE_HOST }}\"" >> $GITHUB_ENV
-          echo "SSH_PRIVATE_KEY=\"${{ secrets.SSH_PRIVATE_KEY }}\"" >> $GITHUB_ENV
+          LINODE_HOST=$(echo "${{ secrets.LINODE_HOST }}" | tr -d '\n' | tr -d '\r')
+          SSH_PRIVATE_KEY=$(echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\n' | tr -d '\r')
+          echo "LINODE_HOST=$LINODE_HOST" >> $GITHUB_ENV
+          echo "SSH_PRIVATE_KEY=$SSH_PRIVATE_KEY" >> $GITHUB_ENV
 
       - name: Run Ansible Playbook
         uses: ansible/ansible-lint-action@v6
@@ -97,6 +97,7 @@ jobs:
           args: ansible-playbook ansible/provision.yml -i ansible/inventory.ini
         env:
           ANSIBLE_HOST_KEY_CHECKING: 'False'
+
 
   deploy:
     
