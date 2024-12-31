@@ -79,6 +79,12 @@ jobs:
     steps:
       - name: Checkout Playbook
         uses: actions/checkout@v4
+      
+      - name: Debug Secret Values
+        run: |
+          echo "LINODE_HOST: ${{ secrets.LINODE_HOST }}"
+          echo "SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}"
+      
 
       - name: Set Environment Variables
         run: |
