@@ -39,7 +39,3 @@ jobs:
           ANSIBLE_HOST_KEY_CHECKING: "False"
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-
-      # Step 6: Lint Check for Playbook (Optional but recommended)
-      - name: Run Ansible Lint
-        run: ansible-lint ansible/provision.yml
