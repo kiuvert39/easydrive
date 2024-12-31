@@ -10,8 +10,6 @@ on:
       - release-*
       - main
 
-
-
 jobs:
   lint:
     if: github.ref == 'refs/heads/main'
@@ -41,9 +39,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set Up Dependabot
-        uses: dependabot/fetch-metadata@v1
-
       - name: Run Security Scan
         run: npm audit --audit-level=high
 
@@ -69,12 +64,11 @@ jobs:
         run: |
           docker build -t my-image-name:${{ github.sha }} .
               
-          - name: Push Docker Image to Docker Hub
-            run: |
-            docker push my-image-name:${{ github.sha }}
+      - name: Push Docker Image to Docker Hub
+        run: |
+          docker push my-image-name:${{ github.sha }}
 
   post_deployment:
-
     if: contains(github.ref, 'refs/pull/') && contains(github.event.pull_request.base.ref, 'release-')
     name: Provision Linode Server
     runs-on: ubuntu-latest
@@ -85,15 +79,15 @@ jobs:
   
       - name: Set Environment Variables
         run: |
-            echo "LINODE_HOST=${{ secrets.LINODE_HOST }}" >> $GITHUB_ENV
-            echo "SSH_PRIVATE_KEY=${{ secrets.SSH_PRIVATE_KEY }}" >> $GITHUB_ENV
+          echo "LINODE_HOST=${{ secrets.LINODE_HOST }}" >> $GITHUB_ENV
+          echo "SSH_PRIVATE_KEY=${{ secrets.SSH_PRIVATE_KEY }}" >> $GITHUB_ENV
   
       - name: Run Ansible Playbook
         uses: ansible/ansible-lint-action@v6
         with:
           args: ansible-playbook ansible/provision.yml -i ansible/inventory.ini
         env:
-            ANSIBLE_HOST_KEY_CHECKING: 'False'
+          ANSIBLE_HOST_KEY_CHECKING: 'False'
 
   deploy:
     if: contains(github.event.pull_request.base.ref, 'release-') && startsWith(github.head_ref, 'v')
