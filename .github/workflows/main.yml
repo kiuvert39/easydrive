@@ -82,14 +82,14 @@ jobs:
       
       - name: Debug Secret Values
         run: |
-          echo "LINODE_HOST: ${{ secrets.LINODE_HOST }}"
+          echo "LINODE_HOST=\"${{ secrets.LINODE_HOST }}\""
           echo "SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}"
       
 
       - name: Set Environment Variables
         run: |
-          echo "LINODE_HOST=${{ secrets.LINODE_HOST }}" >> $GITHUB_ENV
-          echo "SSH_PRIVATE_KEY=${{ secrets.SSH_PRIVATE_KEY }}" >> $GITHUB_ENV
+          echo "LINODE_HOST=\"${{ secrets.LINODE_HOST }}\"" >> $GITHUB_ENV
+          echo "SSH_PRIVATE_KEY=\"${{ secrets.SSH_PRIVATE_KEY }}\"" >> $GITHUB_ENV
 
       - name: Run Ansible Playbook
         uses: ansible/ansible-lint-action@v6
