@@ -73,7 +73,6 @@ jobs:
           docker push egbe01/easydrive:${{ github.sha }}
 
   post_deployment:
-    if: github.event.pull_request.base.ref == 'release-*' && github.event.pull_request.head.ref == 'main'
     name: Provision Linode Server
     runs-on: ubuntu-latest
     needs: build
@@ -94,7 +93,7 @@ jobs:
           ANSIBLE_HOST_KEY_CHECKING: 'False'
 
   deploy:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'release-*' && github.event.pull_request.head.ref == 'main'
+    
     name: Deploy Application
     runs-on: ubuntu-latest
     needs: post_deployment
