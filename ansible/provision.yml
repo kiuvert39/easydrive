@@ -1,15 +1,13 @@
----
 - name: Provision Linode Server and Deploy Docker Container
   hosts: linode
   become: true  # Run tasks with sudo privileges
-  tasks:
-    # Install community.docker collection
+  pre_tasks:
     - name: Install community.docker collection
-      ansible.builtin.pip:
-        name: ansible-collections-community-docker
-        executable: pip3
+      ansible.builtin.command:
+        cmd: ansible-galaxy collection install community.docker
       when: ansible_version.full is version('2.10', '>=')
 
+  tasks:
     # Update and upgrade all packages
     - name: Update and upgrade all packages
       apt:
