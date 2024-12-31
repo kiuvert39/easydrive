@@ -3,16 +3,13 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main
-
+      - main  # Trigger on pushes to the main branch
   pull_request:
     branches:
-      - release-*
-      - main
-  
+      - release-*  # Trigger workflows for PRs targeting release-* branches
+      - main        # Trigger for PRs targeting main branch
 
   workflow_dispatch:  # Manual trigger for the build job
-
 
 jobs:
   lint:
@@ -76,7 +73,7 @@ jobs:
           docker push egbe01/easydrive:${{ github.sha }}
 
   post_deployment:
-    if: contains(github.event.pull_request.base.ref, 'release-') && github.event.pull_request.head.ref == 'main'
+    if: github.event.pull_request.base.ref == 'release-*' && github.event.pull_request.head.ref == 'main'
     name: Provision Linode Server
     runs-on: ubuntu-latest
     needs: build
@@ -97,9 +94,7 @@ jobs:
           ANSIBLE_HOST_KEY_CHECKING: 'False'
 
   deploy:
-    if: github.event.pull_request.merged == true &&
-        contains(github.event.pull_request.base.ref, 'release-') &&
-        github.event.pull_request.head.ref == 'main'
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'release-*' && github.event.pull_request.head.ref == 'main'
     name: Deploy Application
     runs-on: ubuntu-latest
     needs: post_deployment
