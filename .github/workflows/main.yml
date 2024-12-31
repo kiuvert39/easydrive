@@ -3,11 +3,13 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main  # Only trigger on pushes to main
+      - main 
 
   pull_request:
     branches:
-      - release-*  # Trigger workflows for PRs targeting release branches
+      - release-*  
+
+
 
 jobs:
   lint:
@@ -28,26 +30,6 @@ jobs:
 
       - name: Run Linter
         run: npm run lint
-
-  # test:
-  #   if: github.ref == 'refs/heads/main'
-  #   name: Run Tests
-  #   runs-on: ubuntu-latest
-  #   needs: lint
-  #   steps:
-  #     - name: Checkout Code
-  #       uses: actions/checkout@v4
-
-  #     - name: Set Up Node.js
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 18
-
-  #     - name: Install Dependencies
-  #       run: npm install
-
-  #     - name: Run Tests
-  #       run: npm test
 
   security_scan:
     if: github.ref == 'refs/heads/main'
