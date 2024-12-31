@@ -1,0 +1,39 @@
+- name: Provision Linode Server
+  hosts: linode
+  become: true  # Run tasks with sudo privileges
+  tasks:
+    - name: Update and upgrade all packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Ensure essential packages are installed
+      apt:
+        name:
+          - curl
+          - git
+          - unzip
+          - software-properties-common
+        state: present
+
+    # Block for Docker installation and service management
+    - block:
+        - name: Check if Docker is installed
+          command: docker --version
+          register: docker_check
+          ignore_errors: yes
+
+        - name: Install Docker if not installed
+          apt:
+            name: docker.io
+            state: present
+          when: docker_check.failed
+
+        - name: Start and enable Docker service
+          systemd:
+            name: docker
+            state: started
+            enabled: yes
+
+  handlers:
+    # No need to reload Nginx as we are not configuring Nginx in this playbook

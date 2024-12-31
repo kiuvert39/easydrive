@@ -5,6 +5,7 @@ import Layout from "../src/components/layout";
 import CarRentalProcess from "./pages/Booking/car";
 import ProfilePage from "./pages/ProfilePage";
 import HomePage from "./pages/homePage";
+import AboutUs from "./pages/aboutUs";
 
 // Lazy-loaded components
 const LoginPage = React.lazy(() => import("./pages/auth/login.page"));
@@ -33,6 +34,7 @@ const App: React.FC = () => {
             <Route path="bookings" element={<Profile />} />
             <Route path="Profile" element={<ProfilePage/>} />
             <Route path="rents" element={<CarRentalProcess car={car} />} />
+            <Route path="about" element={<AboutUs/>} />
           </Routes>
         </Layout>
       </Suspense>

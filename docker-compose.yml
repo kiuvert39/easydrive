@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      HEALTHCHECK_URL: "http://example.com" # Replace with your domain or internal service name
+    restart: always
