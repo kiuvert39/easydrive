@@ -4,7 +4,7 @@ import { HStack, Link } from "@chakra-ui/react";
 
 const ContactUs: React.FC = () => {
     return (
-        <Box id="contact" bg="#F4E6EC" color="black" py={8} px={4} textAlign="center">
+        <Box bg="#F4E6EC" color="black" py={8} px={4} textAlign="center">
             {/* Project Overview Section */}
             
                 <Heading fontSize="4xl" color="#970747" mb={10} marginTop="10">Let’s Connect!</Heading>

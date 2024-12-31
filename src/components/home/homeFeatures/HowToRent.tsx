@@ -1,5 +1,12 @@
-import { Box, Text, Grid, Heading, Icon } from "@chakra-ui/react";
-import { FaMapMarkerAlt, FaCar, FaSmile, FaMap } from "react-icons/fa";
+import * as React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "../../ui/card";
+import { FaMapMarkerAlt, FaCar, FaSmile } from "react-icons/fa";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "../../ui/carousel";
 
 const HowItWorks = () => {
   const steps = [
@@ -18,51 +25,89 @@ const HowItWorks = () => {
       title: "Enjoy Your Ride",
       description: "Explore new sights and places with comfort.",
     },
-    {
-      icon: FaMap,
-      title: "Return The Car",
-      description: "Leave the car at one of our parks.",
-    },
   ];
 
+  const [api, setApi] = React.useState<CarouselApi>();
+  const [current, setCurrent] = React.useState(0);
+  const [count, setCount] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!api) {
+      return;
+    }
+
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap() + 1);
+
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap() + 1);
+    });
+  }, [api]);
+
   return (
-    <Box id="how-to-rent" bg="#F4E6EC" py={32} px={24}>
+    <div >
       {/* Title Section */}
-      <Box textAlign="center" mb={20}>
-        <Heading color="#970747" fontSize="6xl" fontWeight="bold" mb={2} marginTop={-10}>
+      <div className="text-center mb-12">
+        <h1 className="text-[#970747] text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
           How To Rent
-        </Heading>
-        <Text fontSize="4xl" color="black" fontWeight="bold">
+        </h1>
+        <h2 className="text-black text-2xl md:text-3xl lg:text-4xl font-semibold">
           Simple & Easy Steps
-        </Text>
-        <Text color="black" mt={3}>
+        </h2>
+        <p className="text-black mt-4 text-sm md:text-base lg:text-lg">
           Choose Location, Car & Enjoy Your Ride
           <br />
           When you finish, return the car to one of our parking stations.
-        </Text>
-      </Box>
-      <Grid templateColumns="repeat(auto-fit, minmax(250px, 1fr))" gap={20}>
+        </p>
+      </div>
+
+
+      {/* Carousel Section for small screens */}
+      <div className="md:hidden">
+        <div className="mx-auto max-w-xs">
+          <Carousel setApi={setApi} className="w-full max-w-xs cursor-pointer">
+            <CarouselContent>
+              {steps.map((step, index) => (
+                <CarouselItem key={index}>
+                  <Card className="text-center transition-transform duration-300 hover:scale-105">
+                    <CardHeader>
+                      <step.icon className="text-[#970747] w-12 h-12 mx-auto mb-4" />
+                      <CardTitle className="text-[#970747] text-lg font-semibold">
+                        {step.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-base">{step.description}</p>
+                    </CardContent>
+                  </Card>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+          <div className="py-2 text-center text-sm text-muted-foreground">
+            Step {current} of {count}
+          </div>
+        </div>
+      </div>
+
+      
+      <div className="hidden md:flex md:flex-wrap justify-center gap-6 sm:gap-8 cursor-pointer">
         {steps.map((step, index) => (
-          <Box
+          <Card
             key={index}
-            textAlign="center"
-            bg="white"
-            p={6}
-            boxShadow="lg"
-            borderRadius="lg"
-            maxW="sm"
-            transition="transform 0.3s"
-            _hover={{ transform: "scale(1.05)" }}
+            className="w-full sm:w-[300px] text-center transition-transform duration-300 hover:scale-105"
           >
-            <Icon as={step.icon} w={12} h={12} color="#970747" mb={4} />
-            <Heading size="md" mb={2}>
-              {step.title}
-            </Heading>
-            <Text>{step.description}</Text>
-          </Box>
+            <CardHeader>
+              <step.icon className="text-[#970747] w-12 h-12 mx-auto mb-4" />
+              <CardTitle className="text-[#970747] text-lg font-semibold">{step.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-base">{step.description}</p>
+            </CardContent>
+          </Card>
         ))}
-      </Grid>
-    </Box>
+      </div>
+    </div>
   );
 };
 
