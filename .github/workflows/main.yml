@@ -63,6 +63,7 @@ jobs:
       
       - name: Verify Docker Login
         run: docker info  
+
       - name: Build Docker Image
         run: |
           docker build -t egbe01/easydrive:${{ github.sha }} .
@@ -91,16 +92,18 @@ jobs:
           echo "LINODE_HOST=$LINODE_HOST" >> $GITHUB_ENV
           echo "SSH_PRIVATE_KEY=$SSH_PRIVATE_KEY" >> $GITHUB_ENV
 
+      - name: Install Ansible Collections
+        run: |
+          ansible-galaxy collection install community.docker
+
       - name: Run Ansible Playbook
         uses: ansible/ansible-lint-action@v6
         with:
-          args: ansible-playbook ansible/provision.yml -i ansible/inventory.ini
+          path: ansible/provision.yml  # Replaced 'args' with 'path'
         env:
           ANSIBLE_HOST_KEY_CHECKING: 'False'
 
-
   deploy:
-    
     name: Deploy Application
     runs-on: ubuntu-latest
     needs: post_deployment
