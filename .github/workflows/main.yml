@@ -7,7 +7,8 @@ on:
 
   pull_request:
     branches:
-      - release-*  
+      - release-*
+      - main
 
 
 
