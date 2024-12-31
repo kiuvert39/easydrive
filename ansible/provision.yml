@@ -1,3 +1,4 @@
+---
 - name: Provision Linode Server and Deploy Docker Container
   hosts: linode
   become: true  # Run tasks with sudo privileges
@@ -10,50 +11,59 @@
   tasks:
     # Update and upgrade all packages
     - name: Update and upgrade all packages
-      apt:
+      ansible.builtin.apt:
         update_cache: yes
         upgrade: dist
+      no_log: true  # To avoid printing sensitive info, you can choose to remove this line
 
     # Ensure essential packages are installed
     - name: Ensure essential packages are installed
-      apt:
+      ansible.builtin.apt:
         name:
           - curl
           - git
           - unzip
           - software-properties-common
         state: present
+      no_log: true
 
     # Block for Docker installation and service management
     - block:
         - name: Check if Docker is installed
-          command: docker --version
+          ansible.builtin.command:
+            cmd: docker --version
           register: docker_check
           ignore_errors: yes
+          changed_when: false  # Ensures this task doesn't mark changes if the command succeeds
 
         - name: Install Docker if not installed
-          apt:
+          ansible.builtin.apt:
             name: docker.io
             state: present
           when: docker_check.failed
+          notify:
+            - Start Docker service  # This makes the Docker service start when the package is installed
 
         - name: Start and enable Docker service
-          systemd:
+          ansible.builtin.systemd:
             name: docker
             state: started
             enabled: yes
+          when: docker_check.failed
 
     # Docker login to Docker Hub
     - name: Log into Docker Hub
       community.docker.docker_login:
         username: "{{ lookup('env', 'DOCKER_USERNAME') }}"
         password: "{{ lookup('env', 'DOCKER_PASSWORD') }}"
+      no_log: true  # Avoid logging credentials in the output
 
     # Pull the Docker image from Docker Hub
     - name: Pull Docker image from Docker Hub
       community.docker.docker_image:
         name: "{{ image_tag }}"  # The image_tag is passed from GitHub Actions as an extra var
         source: pull
+      when: docker_check.failed
 
     # Run the Docker container
     - name: Run Docker container
@@ -64,6 +74,12 @@
         restart_policy: always
         published_ports:
           - "80:80"  # Map container port 80 to host port 80 (change as necessary)
+      when: docker_check.failed
 
   handlers:
     # No need to reload Nginx as we are not configuring Nginx in this playbook
+    - name: Start Docker service
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: yes
