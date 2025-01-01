@@ -1,11 +1,12 @@
+---
 - name: Provision Linode Server and Deploy Docker Container
-  hosts: "{{ lookup('env', 'LINODE_HOST') }}"  # Dynamically use the host from the GitHub secret
-  become: true
-  gather_facts: false
-  vars:
-    ansible_ssh_private_key_file: "{{ lookup('env', 'SSH_PRIVATE_KEY') }}"  # Dynamically use the private key from GitHub secret
-    ansible_user: root
-    ansible_port: 22
+  hosts: "{{ linode_host }}"
+  become: true  # Run tasks with sudo privileges
+  pre_tasks:
+    - name: Install community.docker collection
+      ansible.builtin.command:
+        cmd: ansible-galaxy collection install community.docker
+      when: ansible_version.full is version('2.10', '>=')
 
   tasks:
     - name: Update and upgrade all packages
