@@ -1,12 +1,7 @@
 ---
 - name: Provision Linode Server and Deploy Docker Container
-  hosts: "{{ linode_host | default('localhost') }}"
+  hosts: linode  # The group defined in your inventory file
   become: true  # Run tasks with sudo privileges
-  pre_tasks:
-    - name: Install community.docker collection
-      ansible.builtin.command:
-        cmd: ansible-galaxy collection install community.docker
-      when: ansible_version.full is version('2.10', '>=')
 
   tasks:
     - name: Update and upgrade all packages
@@ -51,20 +46,15 @@
 
     - name: Pull Docker image from Docker Hub
       community.docker.docker_image:
-        name: "{{ image_tag }}"
+        name: "{{ image_tag }}"  # Replace with your image tag (e.g., 'myimage:latest')
         source: pull
 
     - name: Run Docker container
       community.docker.docker_container:
-        name: easydrive
-        image: "{{ image_tag }}"
+        name: easydrive  # Name of the container
+        image: "{{ image_tag }}"  # Use the image pulled from Docker Hub
         state: started
         restart_policy: always
         published_ports:
-          - "80:80"
-  handlers:
-    - name: Start Docker service
-      ansible.builtin.systemd:
-        name: docker
-        state: started
-        enabled: yes
+          - "80:80"  # Example port mapping
+
