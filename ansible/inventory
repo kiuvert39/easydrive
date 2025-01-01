@@ -1,2 +1,2 @@
 [linode]
-{{ lookup('env', 'LINODE_HOST') }} ansible_user=root ansible_port=22 ansible_private_key_file={{ lookup('env', 'SSH_PRIVATE_KEY') }}
+linode_host ansible_user=root ansible_port=22
