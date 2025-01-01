@@ -1,2 +1,2 @@
 [linode]
-linode_host ansible_user=root ansible_port=22
+172.236.35.22 ansible_user=root
