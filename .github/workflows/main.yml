@@ -3,12 +3,12 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main  # Trigger on pushes to the main branch
+      - main
   pull_request:
     branches:
-      - release-*  # Trigger workflows for PRs targeting release-* branches
-      - main        # Trigger for PRs targeting main branch
-  workflow_dispatch:  # Manual trigger for the build job
+      - release-* 
+      - main        
+  workflow_dispatch:  
 
 jobs:
   lint:
@@ -76,19 +76,18 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.LINODE_HOST }} >> ~/.ssh/known_hosts
+        env:
+          LINODE_HOST: ${{ secrets.LINODE_HOST }}
 
-      - name: Deploy Docker Image to Linode
+      - name: Deploy Docker Image
         run: |
           echo "Deploying Docker image..."
-          # SSH into the Linode server and pull the Docker image
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@${{ secrets.LINODE_HOST }} <<EOF
             # Pull the Docker image from Docker Hub
             docker pull egbe01/easydrive:${{ github.sha }}
