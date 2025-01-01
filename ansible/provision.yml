@@ -1,6 +1,6 @@
 ---
 - name: Provision Linode Server and Deploy Docker Container
-  hosts: "{{ linode_host }}"
+  hosts: "{{ linode_host | default('localhost') }}"
   become: true  # Run tasks with sudo privileges
   pre_tasks:
     - name: Install community.docker collection
