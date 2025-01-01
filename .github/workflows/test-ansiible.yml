@@ -45,7 +45,8 @@ jobs:
 
       # Step 6: Run the Ansible Playbook
       - name: Run Ansible Playbook
-        run: ansible-playbook ansible/provision.yml
+        run: |
+          ansible-playbook ansible/provision.yml --extra-vars "linode_host=${{ secrets.LINODE_HOST }} ansible_ssh_private_key_file=${{ secrets.SSH_PRIVATE_KEY }}"
         env:
           ANSIBLE_HOST_KEY_CHECKING: "False"
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
