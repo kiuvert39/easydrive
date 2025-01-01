@@ -71,32 +71,32 @@ jobs:
         run: |
           docker push egbe01/easydrive:${{ github.sha }}
 
-  deploy:
-    name: Deploy Application
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+ deploy:
+  name: Deploy Application
+  runs-on: ubuntu-latest
+  needs: build
+  steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-      - name: Set up SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+    - name: Set up SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
 
-      - name: Deploy Docker Image to Linode
-        run: |
-          echo "Deploying Docker image..."
-          # SSH into the Linode server and pull the Docker image
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa user@${{ secrets.LINODE_HOST }} <<EOF
-            # Pull the Docker image from Docker Hub
-            docker pull egbe01/easydrive:${{ github.sha }}
-            
-            # Stop and remove the existing container (if it exists)
-            docker stop easydrive || true
-            docker rm easydrive || true
-            
-            # Run the new Docker container
-            docker run -d --name easydrive -p 80:80 egbe01/easydrive:${{ github.sha }}
-          EOF
+    - name: Deploy Docker Image to Linode
+      run: |
+        echo "Deploying Docker image..."
+        # SSH into the Linode server and pull the Docker image
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@${{ secrets.LINODE_HOST }} <<EOF
+          # Pull the Docker image from Docker Hub
+          docker pull egbe01/easydrive:${{ github.sha }}
+          
+          # Stop and remove the existing container (if it exists)
+          docker stop easydrive || true
+          docker rm easydrive || true
+          
+          # Run the new Docker container
+          docker run -d --name easydrive -p 80:80 egbe01/easydrive:${{ github.sha }}
+        EOF
