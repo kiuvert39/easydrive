@@ -8,7 +8,6 @@ on:
     branches:
       - release-*  # Trigger workflows for PRs targeting release-* branches
       - main        # Trigger for PRs targeting main branch
-
   workflow_dispatch:  # Manual trigger for the build job
 
 jobs:
@@ -72,46 +71,10 @@ jobs:
         run: |
           docker push egbe01/easydrive:${{ github.sha }}
 
-  post_deployment:
-    name: Provision Linode Server
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout Playbook
-        uses: actions/checkout@v4
-
-      - name: Debug Secret Values
-        run: |
-          echo "LINODE_HOST=\"${{ secrets.LINODE_HOST }}\""
-          echo "SSH_PRIVATE_KEY: <hidden>"
-
-      - name: Set Environment Variables
-        run: |
-          LINODE_HOST=$(echo "${{ secrets.LINODE_HOST }}" | tr -d '\n' | tr -d '\r')
-          SSH_PRIVATE_KEY=$(echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\n' | tr -d '\r')
-          echo "LINODE_HOST=$LINODE_HOST" >> $GITHUB_ENV
-          echo "SSH_PRIVATE_KEY=$SSH_PRIVATE_KEY" >> $GITHUB_ENV
-
-      - name: Install Ansible and Docker Collection
-        run: |
-          python -m pip install --upgrade pip
-          pip install ansible
-          ansible-galaxy collection install community.docker
-      
-      - name: Check Ansible Version
-        run: ansible --version
-
-      - name: Run Ansible Playbook
-        uses: ansible/ansible-lint-action@v6
-        with:
-          path: ansible/provision.yml
-        env:
-          ANSIBLE_HOST_KEY_CHECKING: 'False'
-
   deploy:
     name: Deploy Application
     runs-on: ubuntu-latest
-    needs: post_deployment
+    needs: build
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -122,9 +85,18 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      - name: Deploy Application with Ansible
+      - name: Deploy Docker Image to Linode
         run: |
           echo "Deploying Docker image..."
-          # Set environment variables for Docker image and tag
-          export IMAGE_TAG="egbe01/easydrive:${{ github.sha }}"
-          ansible-playbook ansible/deploy.yml -i ansible/inventory.ini --extra-vars "image_tag=$IMAGE_TAG"
+          # SSH into the Linode server and pull the Docker image
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa user@${{ secrets.LINODE_HOST }} <<EOF
+            # Pull the Docker image from Docker Hub
+            docker pull egbe01/easydrive:${{ github.sha }}
+            
+            # Stop and remove the existing container (if it exists)
+            docker stop easydrive || true
+            docker rm easydrive || true
+            
+            # Run the new Docker container
+            docker run -d --name easydrive -p 80:80 egbe01/easydrive:${{ github.sha }}
+          EOF
